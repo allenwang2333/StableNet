@@ -8,7 +8,7 @@ model_names = sorted(name for name in models.__dict__
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 
-parser.add_argument('-data', metavar='DIR', default='DATASET/split_compositional_dominant_sketch_target_photo',
+parser.add_argument('-data', metavar='DIR', default='DATASET/split_compositional_dominant_photo_target_cartoon',
                     help='path to dataset')
 
 parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18_with_table',

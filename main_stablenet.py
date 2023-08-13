@@ -155,7 +155,7 @@ def main_worker(ngpus_per_node, args):
     train_dataset = datasets.ImageFolder(
         traindir,
         transforms.Compose([
-            transforms.RandomResizedCrop(224, scale=(args.min_scale, 1.0)),
+            transforms.RandomResizedCrop((224, 224), scale=(args.min_scale, 1.0)),
             transforms.RandomHorizontalFlip(),
             transforms.ColorJitter(.4, .4, .4, .4),
             transforms.RandomGrayscale(args.gray_scale),

@@ -31,7 +31,11 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
         lossg.backward(retain_graph=True)
         optimizerbl.step()
 
-    if global_epoch == 0 and iter < 10:
+    if global_epoch == 0 and iter < 10: # ! since there is not enough for 1 batch
+        print("**************")
+        print(pre_features.size())
+        print("--------------")
+        print(cfeatures.size())
         pre_features = (pre_features * iter + cfeatures) / (iter + 1)
         pre_weight1 = (pre_weight1 * iter + weight) / (iter + 1)
 

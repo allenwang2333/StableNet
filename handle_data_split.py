@@ -32,9 +32,14 @@ def handle_file(content, index, split_file_path):
                 shutil.copy('PACS/' + file_name, 'DATASET/' + split_file_path + '/val' + file_name[file_name.find('/'):])
 def main():
     folder_path = 'DATASET'
+    # split_file_folder_path = 'split_compositional_dominant_sketch_target_photo'
+    # split_file_folder_path = 'split_compositional_dominant_art_painting_target_sketch'
+    # split_file_folder_path = 'split_compositional_dominant_cartoon_target_art_painting'
+    split_file_folder_path = 'split_compositional_dominant_photo_target_cartoon'
+
     create_folder_if_not_exist(folder_path)
 
-    split_path = folder_path + '/split_compositional_dominant_sketch_target_photo'
+    split_path = folder_path + '/' + split_file_folder_path
     create_folder_if_not_exist(split_path)
     train_path = split_path + '/train'
     create_folder_if_not_exist(train_path)
@@ -52,7 +57,7 @@ def main():
 
 
     print("-----------------------------------------------")
-    generate_files('split_compositional_dominant_sketch_target_photo')
+    generate_files(split_file_folder_path)
 
 if __name__ == '__main__':
     main()
