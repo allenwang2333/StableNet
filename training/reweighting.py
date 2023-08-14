@@ -8,7 +8,7 @@ from training.schedule import lr_setter
 
 def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, iter=0):
     softmax = nn.Softmax(0)
-    weight = Variable(torch.ones(cfeatures.size()[0], 1).cuda())
+    weight = Variable(torch.ones(cfeatures.size()[0], 1).cuda()) # why init weight for every weight learning epoch
     weight.requires_grad = True
     cfeaturec = Variable(torch.FloatTensor(cfeatures.size()).cuda())
     cfeaturec.data.copy_(cfeatures.data)
@@ -19,7 +19,6 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
         lr_setter(optimizerbl, epoch, args, bl=True)
         all_weight = torch.cat((weight, pre_weight1.detach()), dim=0)
         optimizerbl.zero_grad()
-
         lossb = loss_expect.lossb_expect(all_feature, softmax(all_weight), args.num_f, args.sum)
         lossp = softmax(weight).pow(args.decay_pow).sum()
         lambdap = args.lambdap * max((args.lambda_decay_rate ** (global_epoch // args.lambda_decay_epoch)),
@@ -31,15 +30,13 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
         lossg.backward(retain_graph=True)
         optimizerbl.step()
 
-    if global_epoch == 0 and iter < 10: # ! since there is not enough for 1 batch
-        print("**************")
-        print(pre_features.size())
-        print("--------------")
-        print(cfeatures.size())
-        pre_features = (pre_features * iter + cfeatures) / (iter + 1)
-        pre_weight1 = (pre_weight1 * iter + weight) / (iter + 1)
+    # ? I don't understand why that is necessary
 
-    elif cfeatures.size()[0] < pre_features.size()[0]:
+    # if global_epoch == 0 and iter < 10: # ! since there is not enough for 1 batch
+    #     pre_features = (pre_features * iter + cfeatures) / (iter + 1)
+    #     pre_weight1 = (pre_weight1 * iter + weight) / (iter + 1)
+
+    if cfeatures.size()[0] < pre_features.size()[0]:
         pre_features[:cfeatures.size()[0]] = pre_features[:cfeatures.size()[0]] * args.presave_ratio + cfeatures * (
                     1 - args.presave_ratio)
         pre_weight1[:cfeatures.size()[0]] = pre_weight1[:cfeatures.size()[0]] * args.presave_ratio + weight * (

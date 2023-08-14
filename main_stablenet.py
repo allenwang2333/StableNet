@@ -92,6 +92,7 @@ def main_worker(ngpus_per_node, args):
     # model.fc1.bias.requires_grad = True
     # print('Done')
 
+    # Using pre-trained model, fine-tunning the last MLP
     num_ftrs = model.fc1.in_features
     model.fc1 = nn.Linear(num_ftrs, args.classes_num)
     nn.init.xavier_uniform_(model.fc1.weight, .1)
@@ -207,9 +208,13 @@ def main_worker(ngpus_per_node, args):
 
         train(train_loader, model, criterion_train, optimizer, epoch, args, tensor_writer)
 
-        val_acc1 = validate(val_loader, model, criterion, epoch, False, args, tensor_writer)
-        acc1 = validate(test_loader, model, criterion, epoch, True, args, tensor_writer)
+        # ? I don't know why they put test in training step
+        # val_acc1 = validate(val_loader, model, criterion, epoch, False, args, tensor_writer)
+        # acc1 = validate(test_loader, model, criterion, epoch, True, args, tensor_writer)
 
+        acc1 =  validate(val_loader, model, criterion, epoch, False, args, tensor_writer)
+
+        # only look at best accuracy
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
 
@@ -223,6 +228,10 @@ def main_worker(ngpus_per_node, args):
             #     'best_acc1': best_acc1,
             #     'optimizer' : optimizer.state_dict(),
             # }, is_best, args.log_path, epoch)
+    with torch.no_grad():
+        model.eval()
+        test_acc1 = validate(test_loader, model, criterion, epoch, True, args, tensor_writer)
+        print(test_acc1)
 
 
 if __name__ == '__main__':
