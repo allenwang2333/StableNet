@@ -8,16 +8,16 @@ from training.schedule import lr_setter
 
 def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, iter=0):
     softmax = nn.Softmax(0)
-    weight = Variable(torch.ones(cfeatures.size()[0], 1).cuda()) # why init weight for every weight learning epoch
+    weight = Variable(torch.ones(cfeatures.size()[0], 1).cuda()) # 128 * 512
     weight.requires_grad = True
     cfeaturec = Variable(torch.FloatTensor(cfeatures.size()).cuda())
     cfeaturec.data.copy_(cfeatures.data)
-    all_feature = torch.cat([cfeaturec, pre_features.detach()], dim=0)
+    all_feature = torch.cat([cfeaturec, pre_features.detach()], dim=0) # (128 + 128) * 512
     optimizerbl = torch.optim.SGD([weight], lr=args.lrbl, momentum=0.9)
 
     for epoch in range(args.epochb):
         lr_setter(optimizerbl, epoch, args, bl=True)
-        all_weight = torch.cat((weight, pre_weight1.detach()), dim=0)
+        all_weight = torch.cat((weight, pre_weight1.detach()), dim=0) # 256 * 512
         optimizerbl.zero_grad()
         lossb = loss_expect.lossb_expect(all_feature, softmax(all_weight), args.num_f, args.sum)
         lossp = softmax(weight).pow(args.decay_pow).sum()
